@@ -9,7 +9,7 @@ import java.util.List;
  * Created by com on 2017-08-21.
  */
 
-public class CityInfoRepo {
+public class StateInfoRepo {
     @SerializedName("resultCode")
     private String resultCode;
 
@@ -25,25 +25,25 @@ public class CityInfoRepo {
     }
 
 
-    public List<City> city = new ArrayList<>();
+    public List<State> state = new ArrayList<>();
 
-    public List<City> getCity() {
-        return city;
+    public List<State> getState() {
+        return state;
     }
 
-    public class City {
-        @SerializedName("cityCode")
-        private String cityCode;
+    public class State {
+        @SerializedName("stateCode")
+        private String stateCode;
 
-        @SerializedName("cityName")
-        private String cityName;
+        @SerializedName("stateName")
+        private String stateName;
 
-        public String getCityCode() {
-            return cityCode;
+        public String getStateCode() {
+            return stateCode;
         }
 
-        public String getCityName() {
-            return cityName;
+        public String getStateName() {
+            return stateName;
         }
     }
 }

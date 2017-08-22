@@ -19,6 +19,7 @@ import com.citymanage.MainActivity;
 import com.citymanage.R;
 import com.citymanage.member.repo.CityInfoRepo;
 import com.citymanage.member.repo.MemberService;
+import com.citymanage.member.repo.StateInfoRepo;
 import com.citymanage.sidenavi.SideNaviBaseActivity;
 import com.common.Module;
 
@@ -67,7 +68,7 @@ public class AddressSearchActivity extends SideNaviBaseActivity {
         dialog.show();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.0.20:9090/")
+                .baseUrl(BASEHOST)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -78,26 +79,37 @@ public class AddressSearchActivity extends SideNaviBaseActivity {
             @Override
             public void onResponse(Call<CityInfoRepo> call, Response<CityInfoRepo> response) {
 
-                Log.i("CITY INFO","CITYINFO");
-
                 CityInfoRepo cityInfo = response.body();
 
-                //                        Log.i("MEMBERREPO GETNAME: " , String.valueOf(memberRepo.getTm().get(0).getName()));
+                if(cityInfo != null) {
+                    strArrayCityName = new String[cityInfo.getCity().size()];
+                    for (int i = 0; i < cityInfo.getCity().size(); i++) {
 
+                        String cityName = cityInfo.getCity().get(i).getCityName();
+                        String cityCode = cityInfo.getCity().get(i).getCityCode();
 
-                Log.i("CITY INFO : " , String.valueOf(cityInfo.getCity().get(0).getCityName()));
+                        HashMap<String, String> cityInfoHm = new HashMap<>();
+                        cityInfoHm.put("cityName", cityName);
+                        cityInfoHm.put("cityCode", cityCode);
 
-//                setCityAdapter();
+                        strArrayCityName[i] = cityName;
+                        cityNameList.add(i, cityName);
+                        cityList.add(i, cityInfoHm);
 
-                dialog.dismiss();
+                        setCityAdapter();
+
+                        dialog.dismiss();
+                    }
+                } else {
+                    Toast.makeText(AddressSearchActivity.this, cityInfo.getResultMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onFailure(Call<CityInfoRepo> call, Throwable t) {
                 Log.i("ERROR : " , t.getMessage());
                 Log.i("ERROR1 : " , t.getLocalizedMessage());
-                Log.i("ERROR1 : " , t.getStackTrace().toString());
-                Toast.makeText(getApplicationContext(), "Some error occurred!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddressSearchActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -110,6 +122,53 @@ public class AddressSearchActivity extends SideNaviBaseActivity {
                 dialog = new ProgressDialog(AddressSearchActivity.this);
                 dialog.setMessage("Loading....");
                 dialog.show();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASEHOST)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                MemberService service = retrofit.create(MemberService.class);
+                final Call<StateInfoRepo> repos = service.getStateInfo();
+
+                repos.enqueue(new Callback<StateInfoRepo>(){
+                    @Override
+                    public void onResponse(Call<StateInfoRepo> call, Response<StateInfoRepo> response) {
+
+                        StateInfoRepo stateInfo = response.body();
+
+                        if(stateInfo != null) {
+                            strArrayCityName = new String[stateInfo.getState().size()];
+                            for (int i = 0; i < stateInfo.getState().size(); i++) {
+
+                                String stateName = stateInfo.getState().get(i).getStateName();
+                                String stateCode = stateInfo.getState().get(i).getStateCode();
+
+                                HashMap<String, String> stateInfoHm = new HashMap<>();
+                                stateInfoHm.put("stateName", stateName);
+                                stateInfoHm.put("stateCode", stateCode);
+
+                                strArrayStateName[i] = stateName;
+                                stateNameList.add(i, stateCode);
+                                stateList.add(i, stateInfoHm);
+
+                                setStateAdapater();
+
+                                dialog.dismiss();
+                            }
+                        } else {
+                            Toast.makeText(AddressSearchActivity.this, stateInfo.getResultMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<StateInfoRepo> call, Throwable t) {
+                        Log.i("ERROR : " , t.getMessage());
+                        Log.i("ERROR1 : " , t.getLocalizedMessage());
+                        Toast.makeText(AddressSearchActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
 
 //                StringBuilder sb = new StringBuilder(SATATEURL);
 //                sb.append("?cityCode=");

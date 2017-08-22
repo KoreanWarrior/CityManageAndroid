@@ -15,6 +15,10 @@ public interface MemberService {
     Call<MemberRepo> getMemberRepo(@Query("memberId") String id, @Query("memberPwd") String password);
 
     @Headers({"Accept:application/json"})
-    @GET("appLogin.app")
+    @GET("cityInfo.app")
     Call<CityInfoRepo> getCityInfo();
+
+    @Headers({"Accept:application/json"})
+    @GET("stateInfo.app")
+    Call<StateInfoRepo> getStateInfo();
 }
