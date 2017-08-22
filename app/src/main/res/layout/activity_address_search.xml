@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <Spinner
+        android:id="@+id/citySp"
+        android:layout_width="300dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="70dp"
+        android:background="@drawable/selectbox"
+        android:textSize="30dp" />
+
+    <Spinner
+        android:id="@+id/stateSp"
+        android:layout_width="300dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/selectbox"
+        android:textSize="30dp" />
+
+    <Button
+        android:id="@+id/selectConfirmBtn"
+        style="@style/ButtonStyleNxt"
+        android:layout_width="147.33dp"
+        android:layout_height="54dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:text="확인" />
+
+
+</LinearLayout>

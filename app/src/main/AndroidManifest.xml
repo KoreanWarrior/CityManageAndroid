@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.citymanage">
+
+    <!-- 파일 읽기,쓰기 권한 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 파일 읽기,쓰기 권한 -->
+
+
+    <!-- Android mapView LIB -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Android mapView LIB -->
+    <uses-library android:name="com.google.android.maps" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Main">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA3Bi6rtPt24vp1VB93_kjavLhrVuEVxJ8" />
+        <activity android:name=".member.LoginActivity">LoginActivity
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".member.AddressSearchActivity"/>
+        <activity android:name=".MainActivity"/>
+        <activity android:name=".member.RegisterActivity" />
+        <activity android:name=".gm.GmMapActivity" />
+        <activity android:name=".wm.WmListActivity" />
+        <activity android:name=".setting.SettingActivity" />
+        <activity android:name=".wm.WmMapActivity" />
+        <activity android:name=".tm.TmListActivity" />
+        <activity android:name=".tm.TmMapActivity" />
+        <activity android:name=".sm.SmInfoActivity" />
+        <activity android:name=".wm.WmInfoActivity"/>
+        <activity android:name=".tm.TmInfoActivity"/>
+        <activity android:name=".sm.SmListActivity"/>
+        <activity android:name=".sm.SmMapActivity" />
+        <activity android:name=".gm.GmListActivity"/>
+        <activity android:name=".gm.GmInfoActivity"/>
+    </application>
+
+</manifest>
