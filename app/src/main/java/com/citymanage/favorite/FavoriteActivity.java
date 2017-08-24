@@ -3,6 +3,7 @@ package com.citymanage.favorite;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +18,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.citymanage.R;
+import com.citymanage.member.AddressSearchActivity;
+import com.citymanage.member.repo.MemberService;
+import com.citymanage.member.repo.StateInfoRepo;
 import com.citymanage.sidenavi.SideNaviBaseActivity;
 import com.citymanage.tm.TmInfoActivity;
 
@@ -27,6 +31,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Retrofit;
 
 import static com.citymanage.R.id.favoriteHistoryListView;
 
@@ -74,15 +83,69 @@ public class FavoriteActivity extends SideNaviBaseActivity implements View.OnCli
         gTmChk.setOnClickListener(this);
         gGmChk.setOnClickListener(this);
         gSmChk.setOnClickListener(this);
-        /** 체크 박스 셋팅 끝(객체 생성, 체크 박스 태그 생성, 체크 박스 리스너 등록) **/
-
-        gWmChk.setChecked(true);
 
         gFavoriteHistoryLv = (ListView) findViewById(favoriteHistoryListView);
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading....");
         dialog.show();
+
+
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASEHOST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        MemberService service = retrofit.create(MemberService.class);
+        final Call<StateInfoRepo> repos = service.getStateInfo(cityList.get(position).get("cityCode"));
+
+        repos.enqueue(new Callback<StateInfoRepo>(){
+            @Override
+            public void onResponse(Call<StateInfoRepo> call, Response<StateInfoRepo> response) {
+
+                StateInfoRepo stateInfo = response.body();
+
+                if(stateInfo != null) {
+                    strArrayStateName = new String[stateInfo.getState().size()];
+                    for (int i = 0; i < stateInfo.getState().size(); i++) {
+
+                        String stateName = stateInfo.getState().get(i).getStateName();
+                        String stateCode = stateInfo.getState().get(i).getStateCode();
+
+                        HashMap<String, String> stateInfoHm = new HashMap<>();
+                        stateInfoHm.put("stateName", stateName);
+                        stateInfoHm.put("stateCode", stateCode);
+
+                        strArrayStateName[i] = stateName;
+                        stateNameList.add(i, stateCode);
+                        stateList.add(i, stateInfoHm);
+
+                        setStateAdapater();
+
+                        dialog.dismiss();
+                    }
+                } else {
+                    Toast.makeText(FavoriteActivity.this, stateInfo.getResultMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<StateInfoRepo> call, Throwable t) {
+                Log.i("ERROR : " , t.getMessage());
+                Log.i("ERROR1 : " , t.getLocalizedMessage());
+                Toast.makeText(FavoriteActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+    }
+
+
+
+
+
+
+
 
         StringRequest favoriteHistoryRequest = new StringRequest(gFavoriteHistoryUrl, new Response.Listener<String>() {
             @Override
@@ -92,7 +155,7 @@ public class FavoriteActivity extends SideNaviBaseActivity implements View.OnCli
 
                 for(int i = 0; i < gListFavoriteHistory.size(); i ++ ) {
                     adapter.addItem(new FavoriteItem(gListFavoriteHistory.get(i).get("addressInfo"),
-                            gListFavoriteHistory.get(i).get("sensorId"), gListFavoriteHistory.get(i).get("favoriteDescription")));
+                            gListFavoriteHistory.get(i).get("sensorId")));
                 }
                 gFavoriteHistoryLv.setAdapter(adapter);
             }
@@ -129,33 +192,33 @@ public class FavoriteActivity extends SideNaviBaseActivity implements View.OnCli
 
         sb.append(checkedSettingUrl(v.getTag().toString()));
 
-        StringRequest favoriteHistoryItemRequest = new StringRequest(sb.toString(), new Response.Listener<String>() {
-            @Override
-            public void onResponse(String string) {
-
-            //통신을 해서 데이터를 받아 오기전에 리스트뷰를 아무것도 없는 상태로 셋팅한다.
-            adapter.clearItemAll(); //어댑터에 셋팅된 아이템 전부 삭제
-            adapter.notifyDataSetChanged(); //어댑터 정보 갱신
-
-            parseJsonData(string);
-
-            for(int i = 0; i < gListFavoriteHistory.size(); i ++ ) {
-                adapter.addItem(new FavoriteItem(gListFavoriteHistory.get(i).get("addressInfo"),
-                        gListFavoriteHistory.get(i).get("sensorId"), gListFavoriteHistory.get(i).get("favoriteDescription")));
-            }
-            gFavoriteHistoryLv.setAdapter(adapter);
-
-            gFavoriteHistoryLv.deferNotifyDataSetChanged();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-            Toast.makeText(getApplicationContext(), "Some error occurred!!", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-            }
-        });
-        RequestQueue rQueue = Volley.newRequestQueue(FavoriteActivity.this);
-        rQueue.add(favoriteHistoryItemRequest);
+//        StringRequest favoriteHistoryItemRequest = new StringRequest(sb.toString(), new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String string) {
+//
+//            //통신을 해서 데이터를 받아 오기전에 리스트뷰를 아무것도 없는 상태로 셋팅한다.
+//            adapter.clearItemAll(); //어댑터에 셋팅된 아이템 전부 삭제
+//            adapter.notifyDataSetChanged(); //어댑터 정보 갱신
+//
+//            parseJsonData(string);
+//
+//            for(int i = 0; i < gListFavoriteHistory.size(); i ++ ) {
+//                adapter.addItem(new FavoriteItem(gListFavoriteHistory.get(i).get("addressInfo"),
+//                        gListFavoriteHistory.get(i).get("sensorId"), gListFavoriteHistory.get(i).get("favoriteDescription")));
+//            }
+//            gFavoriteHistoryLv.setAdapter(adapter);
+//
+//            gFavoriteHistoryLv.deferNotifyDataSetChanged();
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError volleyError) {
+//            Toast.makeText(getApplicationContext(), "Some error occurred!!", Toast.LENGTH_SHORT).show();
+//            dialog.dismiss();
+//            }
+//        });
+//        RequestQueue rQueue = Volley.newRequestQueue(FavoriteActivity.this);
+//        rQueue.add(favoriteHistoryItemRequest);
     }
 
     //통신 후 json 파싱
